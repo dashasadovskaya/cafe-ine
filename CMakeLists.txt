@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 project(cafe-in C CXX)
 
+# Требуется C++17 для std::optional, structured binding и filesystem
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Locate wxWidgets package and required components.
 # README suggests the wxWidgets_ROOT environment variable on Windows, while
@@ -15,24 +17,50 @@ endif()
 find_package(wxWidgets REQUIRED COMPONENTS core base)
 include(${wxWidgets_USE_FILE})
 
-find_package(Threads REQUIRED)
-
 enable_testing()
 
-# Embedded SQLite used by the database layer.
+# ---------------------------------------------------------------------------
+# 1. Встраиваемый SQLite (SQLite/sqlite3.c, SQLite/sqlite3.h)
+# ---------------------------------------------------------------------------
 add_library(sqlite3 STATIC
     SQLite/sqlite3.c
     SQLite/sqlite3.h
 )
-target_include_directories(sqlite3 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/SQLite)
 
-# Application logic is independent of the GUI and can be tested on its own.
-add_library(Logic STATIC app/logic.cpp app/logic.h)
-target_include_directories(Logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/app)
+target_include_directories(sqlite3 PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}/SQLite
+)
 
+# Для работы SQLite на Linux/POSIX требуются библиотеки dl и pthread
+target_link_libraries(sqlite3 PUBLIC 
+    Threads::Threads 
+    ${CMAKE_DL_LIBS}
+)
+
+# ---------------------------------------------------------------------------
+# 2. Библиотека бизнес-логики и работы с БД (Logic)
+# ---------------------------------------------------------------------------
+add_library(Logic STATIC
+    app/logic.cpp
+    app/logic.h
+    SQLite/database.cpp
+    SQLite/database.h
+)
+
+target_include_directories(Logic PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/app
+    ${CMAKE_CURRENT_SOURCE_DIR}/SQLite
+)
+
+target_link_libraries(Logic PUBLIC
+    sqlite3
+    Threads::Threads
+)
+
+# Корректная обработка русских UTF-8 строковых литералов в MSVC
 if(MSVC)
-    # Source files contain Russian UTF-8 string literals.
     target_compile_options(Logic PUBLIC /utf-8)
+    target_compile_options(sqlite3 PRIVATE /utf-8)
 endif()
 
 # GUI executable. All screens live in gui/; main.cpp only starts the app.
@@ -95,4 +123,5 @@ endif()
 add_executable(test_logic app/main.cpp)
 target_link_libraries(test_logic PRIVATE Logic)
 
-add_test(NAME logic_self_test COMMAND test_logic)
+# Регистрация в CTest
+add_test(NAME database_logic_test COMMAND cafe_db_demo)

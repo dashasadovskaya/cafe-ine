@@ -274,6 +274,7 @@ private:
 class Logic {
 public:
     // 1 point = 1 ruble of discount. A customer earns 1 point per 100 rubles.
+    friend class Database;
     static constexpr int POINTS_PER_100_RUBLES = 1;
     static constexpr double MAX_POINTS_DISCOUNT_SHARE = 0.5;
 
