@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 project(cafe-in C CXX)
 
+find_package(Threads REQUIRED)
+
 # Требуется C++17 для std::optional, structured binding и filesystem
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -123,5 +125,10 @@ endif()
 add_executable(test_logic app/main.cpp)
 target_link_libraries(test_logic PRIVATE Logic)
 
+# Small console demo that opens/creates the SQLite database.
+add_executable(cafe_db_demo SQLite/cafe-indb.cpp)
+target_link_libraries(cafe_db_demo PRIVATE sqlite3)
+
 # Регистрация в CTest
 add_test(NAME database_logic_test COMMAND cafe_db_demo)
+add_test(NAME logic_test COMMAND test_logic)
