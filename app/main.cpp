@@ -71,12 +71,12 @@ int main() {
     Cart cart = logic.viewCart(userId);
     check(cart.getItemCount() == 3, "cart counts units");
     check(cart.getLineCount() == 2, "cart counts lines");
-    check(approx(cart.getTotal(), 460.0), "cart total is calculated");
-    check(approx(logic.calculateDeliveryCost(userId), 150.0),
+    check(approx(cart.getTotal(), 46.0), "cart total is calculated");
+    check(approx(logic.calculateDeliveryCost(userId), 15.0),
           "delivery is paid below the free threshold");
 
     check(logic.setCartItemQuantity(userId, espressoId, 1), "cart quantity can be changed");
-    check(approx(logic.viewCart(userId).getTotal(), 340.0), "cart total after quantity change");
+    check(approx(logic.viewCart(userId).getTotal(), 34.0), "cart total after quantity change");
 
     check(logic.removeFromUserCart(userId, cappuccino.front().getId(), 1),
           "item can be removed from cart");
@@ -89,7 +89,7 @@ int main() {
     check(logic.addToUserCart(userId, espressoId, 2), "add espressos for the order");
     check(logic.addToUserCart(userId, pastaId, 1), "add pasta for the order");
     check(logic.addToUserCart(userId, cheesecakeId, 1), "add cheesecake for the order");
-    check(approx(logic.viewCart(userId).getTotal(), 1010.0), "order items total");
+    check(approx(logic.viewCart(userId).getTotal(), 101.0), "order items total");
 
     check(logic.addUserPoints(userId, 50), "bonus points can be added");
     check(logic.getUserPoints(userId) == 50, "bonus points balance");
@@ -102,14 +102,14 @@ int main() {
 
     const auto order = logic.findOrder(orderId.value());
     check(order.has_value(), "placed order can be found");
-    check(approx(order->getItemsTotal(), 1010.0), "order items total is saved");
+    check(approx(order->getItemsTotal(), 101.0), "order items total is saved");
     check(approx(order->getDeliveryCost(), 0.0), "free delivery above threshold");
     check(order->getPointsSpent() == 20, "points discount is applied");
-    check(approx(order->getTotal(), 990.0), "order total with discount");
-    check(order->getPointsEarned() == 9, "points are earned for the order");
+    check(approx(order->getTotal(), 81.0), "order total with discount");
+    check(order->getPointsEarned() == 0, "no points are earned below the points threshold");
     check(order->getStatus() == OrderStatus::Created, "new order status");
     check(logic.viewCart(userId).isEmpty(), "cart is cleared after placing an order");
-    check(logic.getUserPoints(userId) == 39, "points balance after order");
+    check(logic.getUserPoints(userId) == 30, "points balance after order");
     check(logic.getUserOrders(userId).size() == 1, "order is in user history");
 
     check(logic.updateOrderStatus(orderId.value(), OrderStatus::Preparing),
@@ -141,13 +141,13 @@ int main() {
 
     // --- Menu administration ---------------------------------------------
     const itemid_t newItemId = logic.addMenuItem(
-        Item(0, "Тестовый напиток", "Напиток для проверки", 100.0, "200 мл"));
+        Item(0, "Тестовый напиток", "Напиток для проверки", 10.0, "200 мл"));
     check(newItemId > 0, "new menu item receives an id");
 
     Item changed = logic.findItem(newItemId).value();
-    changed.setPrice(130.0);
+    changed.setPrice(13.0);
     check(logic.updateMenuItem(changed), "menu item can be updated");
-    check(approx(logic.findItem(newItemId)->getPrice(), 130.0), "menu item price is saved");
+    check(approx(logic.findItem(newItemId)->getPrice(), 13.0), "menu item price is saved");
 
     check(logic.setItemAvailability(newItemId, false), "menu item availability can be changed");
     check(!logic.addToUserCart(userId, newItemId, 1),

@@ -358,8 +358,8 @@ private:
     orderid_t nextOrderId_ = 1;
     reviewid_t nextReviewId_ = 1;
 
-    double deliveryBaseCost_ = 150.0;
-    double freeDeliveryFrom_ = 1000.0;
+    double deliveryBaseCost_ = 15.0;
+    double freeDeliveryFrom_ = 100.0;
 };
 
 #endif

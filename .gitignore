@@ -3,6 +3,7 @@ build/
 out/
 bin/
 obj/
+.build/
 
 # CMake cache and auto-generated files
 CMakeCache.txt

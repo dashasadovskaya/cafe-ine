@@ -33,7 +33,7 @@ void AboutPanel::BuildUi() {
                 "горячие блюда и десерты.\n"
                 "Мы готовим из свежих продуктов и доставляем заказы по Минску.\n"
                 "Баллы: 1 балл = 1 Br скидки (не более 50% стоимости блюд), "
-                "доставка бесплатна от 1000 Br."));
+                "доставка бесплатна от 100 Br."));
     description->Wrap(760);
     description->SetForegroundColour(wxColour(70, 70, 70));
     root->Add(description, 0, wxLEFT | wxRIGHT | wxTOP, 12);
